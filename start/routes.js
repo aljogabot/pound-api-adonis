@@ -14,7 +14,8 @@
 */
 
 const routes = [
-    'api/auth'
+    'api/auth',
+    'api/clients'
 ]
 
 routes.forEach(route => require(`../routes/${route}`))

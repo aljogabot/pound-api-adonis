@@ -13,9 +13,8 @@
 |
 */
 
-/** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
-const Route = use('Route')
+const routes = [
+    'api/auth'
+]
 
-Route.get('/', () => {
-  return { greeting: 'Hello world in JSON' }
-})
+routes.forEach(route => require(`../routes/${route}`))

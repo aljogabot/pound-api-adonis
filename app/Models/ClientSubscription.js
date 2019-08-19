@@ -4,6 +4,11 @@
 const Model = use('Model')
 
 class ClientSubscription extends Model {
+
+    client () {
+        return this.belongsTo('App/Models/Client')
+    }
+
 }
 
 module.exports = ClientSubscription

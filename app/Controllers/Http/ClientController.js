@@ -4,8 +4,12 @@ const Client = use('App/Models/Client')
 
 class ClientController {
 
-    async listAll () {
-        return {clients: await Client.all()}
+    async listAll() {
+        return { clients: await Client.all() }
+    }
+
+    async listWithPagination() {
+
     }
 
 }

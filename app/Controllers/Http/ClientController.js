@@ -1,6 +1,8 @@
 'use strict'
 
 const Client = use('App/Models/Client')
+const ClientMembershipYearly = use('App/Services/ClientMembership/Yearly')
+const ClientService = use('App/Services/ClientService')
 
 class ClientController {
 
@@ -31,14 +33,43 @@ class ClientController {
     async update({ request, params }) {
         const client = await Client.find(params.id)
 
-        client.fill(request.all())
+        client.merge(request.all())
         await client.save()
 
         return { client }
     }
 
     async create({ request, params }) {
-        
+        await ClientService.checkIfExists(request.only(['first_name', 'last_name']))
+
+        const membershipAndSubscrpiptionVars = ['membership_id', 'membership_start_date', 'subscription_id', 'subscription_start_date']
+        const clientData = request.except(membershipAndSubscrpiptionVars)
+        const client = await Client.create(clientData)
+
+        if (request.input('membership_id')) {
+
+            try {
+                const clientMembership = await ClientMembershipYearly.setData(request.only(membershipAndSubscrpiptionVars))
+                    .create(client)
+            } catch (error) {
+                client.delete()
+            }
+            
+            // TODO: LATER ...
+            // if (request.input('subscription_id')) {
+
+            //     try {
+                    
+            //     } catch (error) {
+            //         client.delete()
+            //         clientMembership.delete()
+            //     }
+
+            // }
+
+        }
+
+        return true
     }
 }
 

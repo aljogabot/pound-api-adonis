@@ -8,6 +8,8 @@ class Subscription extends Model {
         if (field == 'created_at') {
             return value.format('MMM d, Y')
         }
+        
+        return super.formatDates(field, value)
     }
 
     static get computed() {

@@ -9,6 +9,8 @@ class Client extends Model {
         if (field == 'created_at') {
             return value.format('MMM d, Y')
         }
+
+        return super.formatDates(field, value)
     }
 
     static get computed() {
@@ -23,6 +25,10 @@ class Client extends Model {
 
     getName({ first_name, last_name }) {
         return `${first_name} ${last_name}`
+    }
+
+    fullName() {
+        return `${this.first_name} ${this.last_name}`
     }
 
     attendances() {
@@ -47,6 +53,11 @@ class Client extends Model {
 
     currentClientMembership() {
         return this.hasOne('App/Models/ClientMembership').orderBy('created_at')
+    }
+
+    static scopeCheckIfExists (query, data) {
+        return query.where('first_name', '=', data.first_name)
+            .where('last_name', '=', data.last_name)
     }
 }
 

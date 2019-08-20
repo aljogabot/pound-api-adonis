@@ -27,6 +27,12 @@ class ClientController {
     async view({ request, params }) {
         return await Client.find(params.id)
     }
+
+    async update({ request, params }) {
+        const client = await Client.find(params.id)
+
+
+    }
 }
 
 module.exports = ClientController

@@ -10,7 +10,7 @@ class ClientController {
 
     async listWithPagination({ request }) {
         const paginationParams = request.all()
-        let clientQuery = Client.query()
+        let clientQuery = Client.query().with('subscriptions')
 
         const orderBy = request.input('sort_by', 'created_at')
         const orderDirection = request.input('sort_direction', 'desc')
@@ -24,6 +24,9 @@ class ClientController {
         return await clientQuery.orderBy(orderBy, orderDirection).paginate(paginationParams.page, rowsPerPage)
     }
 
+    async view({ request, params }) {
+        return await Client.find(params.id)
+    }
 }
 
 module.exports = ClientController

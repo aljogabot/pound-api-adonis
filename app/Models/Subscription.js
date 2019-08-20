@@ -6,7 +6,7 @@ const Model = use('Model')
 class Subscription extends Model {
     static castDates(field, value) {
         if (field == 'created_at') {
-            return value.format('M d, Y')
+            return value.format('MMM d, Y')
         }
     }
 
@@ -22,7 +22,7 @@ class Subscription extends Model {
         return `${description} P${amount}`
     }
 
-    clientSubscription () {
+    clientSubscriptions () {
         return this.hasMany('App/Models/ClientSubscription')
     }
 }

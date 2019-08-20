@@ -8,4 +8,5 @@ Route.group(() => {
     Route.get('all', 'ClientController.listAll')
     Route.get(':id', 'ClientController.view')
     Route.post(':id/update', 'ClientController.update').validator('UpdateClientValidation')
+    Route.post('create', 'ClientController.create').validator('CreateClientValidation')
 }).prefix('api/clients').middleware('auth')

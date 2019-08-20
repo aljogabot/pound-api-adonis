@@ -31,7 +31,14 @@ class ClientController {
     async update({ request, params }) {
         const client = await Client.find(params.id)
 
+        client.fill(request.all())
+        await client.save()
 
+        return { client }
+    }
+
+    async create({ request, params }) {
+        
     }
 }
 

@@ -19,7 +19,7 @@ class Client extends Model {
 
     static boot () {
         super.boot()
-        this.addHook('afterFind', 'ClientHook.attachCurrentClientSubscription')
+        this.addHook('afterFind', 'ClientHook.attachRelatedModelsOnFind')
         this.addHook('afterPaginate', 'ClientHook.attachCurrentClientSubscriptionOnClients')
     }
 

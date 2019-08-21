@@ -4,6 +4,7 @@ const Yearly = use('App/Services/ClientSubscription/Yearly')
 const Monthly = use('App/Services/ClientSubscription/Monthly')
 
 const Subscription = use('App/Models/Subscription')
+const SubscriptionNotFoundException = use('App/Exceptions/SubscriptionNotFoundException')
 
 class ClientSubscriptionFactory
 {
@@ -11,12 +12,16 @@ class ClientSubscriptionFactory
         const subscription = await Subscription.find(subscriptionId)
 
         if (! subscription) {
-            client.delete()
-            clientMembership.delete()
+            throw new SubscriptionNotFoundException()
         }
 
         const durationType = subscription.type.charAt(0).toUpperCase() + subscription.type.slice(1) + 'ly'
-        const className = new durationType(client, subscription)
+        // return eval(`new ${durationType}(${client}, ${subscription})`)
+
+        const clientSubscriptionClass = eval(`new ${durationType}()`)
+        clientSubscriptionClass.setClient(client)
+        clientSubscriptionClass.setSubscription(subscription)
+        return clientSubscriptionClass
     }
 }
 

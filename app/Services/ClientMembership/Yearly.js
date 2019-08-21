@@ -8,6 +8,7 @@ const Membership = use('App/Models/Membership')
 const ClientMembership = use('App/Models/ClientMembership')
 const MembershipNotFoundException = use('App/Exceptions/MembershipNotFoundException')
 const CannotAddClientMembershipException = use('App/Exceptions/CannotAddClientMembershipException')
+const ClientAlreadyHasValidMembershipException = use('App/Exceptions/ClientAlreadyHasValidMembershipException')
 
 class ClientMembershipYearly {
     constructor () {
@@ -15,6 +16,10 @@ class ClientMembershipYearly {
     }
 
     async create (client) {
+        if (client.has_valid_membership) {
+            throw new ClientAlreadyHasValidMembershipException()
+        }
+        
         const membership = await Membership.find(this.clientMembershipData.membership_id)
         if (! membership) {
             throw new MembershipNotFoundException()

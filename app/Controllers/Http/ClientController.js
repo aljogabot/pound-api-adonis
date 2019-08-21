@@ -8,6 +8,9 @@ const ClientSubscriptionFactory = use('App/Services/ClientSubscription/ClientSub
 
 const MembershipNotFoundException = use('App/Exceptions/MembershipNotFoundException')
 const CannotAddClientMembershipException = use('App/Exceptions/CannotAddClientMembershipException')
+const ClientAlreadyHasValidMembershipException = use('App/Exceptions/ClientAlreadyHasValidMembershipException')
+const ClientAlreadyHasValidSubscriptionException = use('App/Exceptions/ClientAlreadyHasValidSubscriptionException')
+const CannotAddClientSubscriptionException = use('App/Exceptions/CannotAddClientSubscriptionException')
 
 class ClientController {
 
@@ -53,12 +56,13 @@ class ClientController {
         const membershipAndSubscriptionData = request.only(membershipAndSubscriptionVars)
 
         if (request.input('membership_id')) {
-            
+            let clientMembership
+
             try {
-                const clientMembership = await ClientMembershipYearly.setData(membershipAndSubscriptionData)
+
+                clientMembership = await ClientMembershipYearly.setData(membershipAndSubscriptionData)
                     .create(client)
 
-                clientMembership.reload()
             } catch (error) {
                 client.delete()
 
@@ -66,17 +70,27 @@ class ClientController {
                 eval(`throw new ${classExceptionName}()`)
                 return
             }
+
             
             // TODO: LATER ...
             if (request.input('subscription_id')) {
                 try {
-                    const ClientSubscriptionService = ClientSubscriptionFactory.initialize(client, request.input('subscription_id'))
+                    const ClientSubscriptionService = await ClientSubscriptionFactory.initialize(client, request.input('subscription_id'))
+
                     ClientSubscriptionService.setData(membershipAndSubscriptionData)
-                    ClientSubscriptionService.debug()    
+                        .setClientMembership(clientMembership)
+                    await ClientSubscriptionService.create()
                 } catch (error) {
+                    client.delete()
+                    await clientMembership.load('payment')
+                    const payment = clientMembership.getRelated('payment')
+                    payment.delete()
                     clientMembership.delete()
+
+                    const classExceptionName = error.name ? error.name : 'CannotAddClientSubscriptionException'
+                    eval(`throw new ${classExceptionName}()`)
+                    return
                 }
-                
             }
 
         }

@@ -7,6 +7,10 @@ const Model = use('Model')
 
 class ClientSubscription extends Model {
 
+    static get dates() {
+        return super.dates.concat(['valid_from', 'valid_until'])
+    }
+
     client () {
         return this.belongsTo('App/Models/Client')
     }
@@ -16,7 +20,7 @@ class ClientSubscription extends Model {
     }
 
     getActive({ valid_until }) {
-        return valid_until > moment()
+        return moment(valid_until) > moment()
     }
 
 }

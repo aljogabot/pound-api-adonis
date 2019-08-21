@@ -11,16 +11,20 @@ class ClientMembership extends Model {
         return super.dates.concat(['valid_from', 'valid_until'])
     }
 
-    // static castDates(field, value) {
-    //     // if (field == 'valid_until' || field == 'valid_from') {
-    //     //     return value.format('MMM d, Y')
-    //     // }
+    static castDates(field, value) {
+        // if (field == 'valid_until' || field == 'valid_from') {
+        //     return value.format('MMM d, Y')
+        // }
 
-    //     return super.formatDates(field, value)
-    // }
+        return super.formatDates(field, value)
+    }
 
     static get computed() {
-        return ['is_valid', 'active']
+        return ['is_valid', 'active', 'active_until']
+    }
+
+    getActiveUntil ({ valid_until }) {
+        return moment(valid_until).format('MMM d, Y')
     }
 
     getIsValid ({ valid_until }) {

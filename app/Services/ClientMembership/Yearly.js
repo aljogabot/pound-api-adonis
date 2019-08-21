@@ -37,8 +37,8 @@ class ClientMembershipYearly {
         clientMembership.fill({
             valid_from: startDate,
             valid_until: plusOneYear,
-            description: 'One Year Membership',
-            remarks: `${membership.description} for client: ${client.fullName()}`,
+            description: this.clientMembershipData.description ? this.clientMembershipData.description : 'One Year Membership',
+            remarks: this.clientMembershipData.remarks ? this.clientMembershipData.remarks : `${membership.description} for client: ${client.fullName()}`,
             payment_id: this.payment.id,
             membership_id: membership.id
         })

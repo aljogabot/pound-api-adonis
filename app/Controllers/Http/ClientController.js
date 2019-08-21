@@ -19,8 +19,10 @@ class ClientController {
     }
 
     async listWithPagination({ request }) {
+        
         const paginationParams = request.all()
-        let clientQuery = Client.query().with('subscriptions')
+
+        const clientQuery = Client.query().with('subscriptions')
 
         const orderBy = request.input('sort_by', 'created_at')
         const orderDirection = request.input('sort_direction', 'desc')

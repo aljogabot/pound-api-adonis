@@ -1,8 +1,13 @@
 'use strict'
 
 const Client = use('App/Models/Client')
+
 const ClientMembershipYearly = use('App/Services/ClientMembership/Yearly')
 const ClientService = use('App/Services/ClientService')
+const ClientSubscriptionFactory = use('App/Services/ClientSubscription/ClientSubscriptionFactory')
+
+const MembershipNotFoundException = use('App/Exceptions/MembershipNotFoundException')
+const CannotAddClientMembershipException = use('App/Exceptions/CannotAddClientMembershipException')
 
 class ClientController {
 
@@ -42,34 +47,41 @@ class ClientController {
     async create({ request, params }) {
         await ClientService.checkIfExists(request.only(['first_name', 'last_name']))
 
-        const membershipAndSubscrpiptionVars = ['membership_id', 'membership_start_date', 'subscription_id', 'subscription_start_date']
-        const clientData = request.except(membershipAndSubscrpiptionVars)
+        const membershipAndSubscriptionVars = ['membership_id', 'membership_start_date', 'subscription_id', 'subscription_start_date']
+        const clientData = request.except(membershipAndSubscriptionVars)
         const client = await Client.create(clientData)
+        const membershipAndSubscriptionData = request.only(membershipAndSubscriptionVars)
 
         if (request.input('membership_id')) {
-
+            
             try {
-                const clientMembership = await ClientMembershipYearly.setData(request.only(membershipAndSubscrpiptionVars))
+                const clientMembership = await ClientMembershipYearly.setData(membershipAndSubscriptionData)
                     .create(client)
+
+                clientMembership.reload()
             } catch (error) {
                 client.delete()
+
+                const classExceptionName = error.name ? error.name : 'CannotAddClientMembershipException'
+                eval(`throw new ${classExceptionName}()`)
+                return
             }
             
             // TODO: LATER ...
-            // if (request.input('subscription_id')) {
-
-            //     try {
-                    
-            //     } catch (error) {
-            //         client.delete()
-            //         clientMembership.delete()
-            //     }
-
-            // }
+            if (request.input('subscription_id')) {
+                try {
+                    const ClientSubscriptionService = ClientSubscriptionFactory.initialize(client, request.input('subscription_id'))
+                    ClientSubscriptionService.setData(membershipAndSubscriptionData)
+                    ClientSubscriptionService.debug()    
+                } catch (error) {
+                    clientMembership.delete()
+                }
+                
+            }
 
         }
 
-        return true
+        return {message: 'Yeah', client}
     }
 }
 

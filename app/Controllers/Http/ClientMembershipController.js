@@ -8,7 +8,7 @@ const ClientMembershipNotFoundException = use('App/Exceptions/ClientMembershipNo
 const DeleteResourceNotAllowedException = use('App/Exceptions/DeleteResourceNotAllowedException')
 
 const CannotAddClientMembershipException = use('App/Exceptions/CannotAddClientMembershipException')
-const ClientAlreadyHasValidMembershipException = use('App/Exceptions/ClientAlreadyHasValidMembershipException')
+const ClientAlreadyHasValidMemzbershipException = use('App/Exceptions/ClientAlreadyHasValidMembershipException')
 
 class ClientMembershipController {
 
@@ -26,15 +26,17 @@ class ClientMembershipController {
 
         if (paginationParams.search.length > 0) {
             clientMembershipQuery.whereHas('client', (query) => {
-                return query.where('first_name', 'like', `%${paginationParams.search}%`)
-                    .orWhere('last_name', 'like', `%${paginationParams.search}%`)
+                return query.where((query) => {
+                    query.where('first_name', 'like', `%${paginationParams.search}%`)
+                        .orWhere('last_name', 'like', `%${paginationParams.search}%`)
+                })
             })
         }
 
         return await clientMembershipQuery.orderBy(orderBy, orderDirection).paginate(paginationParams.page, rowsPerPage)
     }
 
-    async view ({ request, params }) {
+    async view ({ params }) {
         const clientMembership = ClientMembership.find(params.id)
 
         if (! clientMembership ) {
@@ -47,7 +49,6 @@ class ClientMembershipController {
     async create ({ request }) {
         const client = await Client.findOrFail(request.input('client_id'))
         
-        let clientMembership
         const clientMembershipData = {
             membership_id: request.input('membership_id'),
             membership_start_date: request.input('client_started'),
@@ -56,15 +57,14 @@ class ClientMembershipController {
         }
 
         try {
-            clientMembership = await ClientMembershipYearly.setData(clientMembershipData)
+
+            await ClientMembershipYearly.setData(clientMembershipData)
                 .create(client)
 
         } catch (error) {
             const classExceptionName = error.name ? error.name : 'CannotAddClientMembershipException'
             eval(`throw new ${classExceptionName}()`)
         }
-
-        return
     }
 
     async update () {}

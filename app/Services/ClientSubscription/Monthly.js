@@ -7,6 +7,7 @@ const ClientSubscription = use('App/Models/ClientSubscription')
 
 const ClientAlreadyHasValidSubscriptionException = use('App/Exceptions/ClientAlreadyHasValidSubscriptionException')
 const CannotAddClientSubscriptionException = use('App/Exceptions/CannotAddClientSubscriptionException')
+const ClientMustHaveAValidMembershipFirstException = use('App/Exceptions/ClientMustHaveAValidMembershipFirstException')
 
 class Monthly {
     constructor () {
@@ -34,6 +35,10 @@ class Monthly {
     }
 
     async create () {
+        if (! this.client.has_valid_membership) {
+            throw new ClientMustHaveAValidMembershipFirstException()
+        }
+
         if (this.client.has_valid_subscription) {
             throw new ClientAlreadyHasValidSubscriptionException()
         }
@@ -51,8 +56,8 @@ class Monthly {
             valid_from: startDate,
             client_started: startDate,
             valid_until: plusOneYear,
-            description: this.subscription.description,
-            remarks: `${this.subscription.description} for client: ${this.client.fullName()}`,
+            description: this.clientSubscriptionData.description ? this.clientSubscriptionData.description : this.subscription.description,
+            remarks: this.clientSubscriptionData.remarks ? this.clientSubscriptionData.remarks : `${this.subscription.description} for client: ${this.client.fullName()}`,
             payment_id: this.payment.id,
             subscription_id: this.subscription.id,
             client_membership_id: this.clientMembership.id

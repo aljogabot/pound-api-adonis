@@ -11,6 +11,7 @@ const CannotAddClientMembershipException = use('App/Exceptions/CannotAddClientMe
 const ClientAlreadyHasValidMembershipException = use('App/Exceptions/ClientAlreadyHasValidMembershipException')
 const ClientAlreadyHasValidSubscriptionException = use('App/Exceptions/ClientAlreadyHasValidSubscriptionException')
 const CannotAddClientSubscriptionException = use('App/Exceptions/CannotAddClientSubscriptionException')
+const ClientMustHaveAValidMembershipFirstException = use('App/Exceptions/ClientMustHaveAValidMembershipFirstException')
 
 class ClientController {
 
@@ -77,6 +78,7 @@ class ClientController {
             // TODO: LATER ...
             if (request.input('subscription_id')) {
                 try {
+                    await client.reload()
                     const ClientSubscriptionService = await ClientSubscriptionFactory.initialize(client, request.input('subscription_id'))
 
                     ClientSubscriptionService.setData(membershipAndSubscriptionData)

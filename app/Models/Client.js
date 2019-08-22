@@ -3,24 +3,30 @@
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
 
+const moment = use('moment')
+
 class Client extends Model {
 
+    static boot() {
+        super.boot()
+        this.addHook('afterFind', 'ClientHook.attachRelatedModelsOnFind')
+        this.addHook('afterPaginate', 'ClientHook.attachCurrentClientSubscriptionOnClients')
+    }
+
     static castDates(field, value) {
-        if (field == 'created_at') {
-            return value.format('MMM d, Y')
-        }
+        // if (field == 'created_at') {
+        //     return value.format('MMM d, Y')
+        // }
 
         return super.formatDates(field, value)
     }
 
     static get computed() {
-        return ['name']
+        return ['name', 'date_created']
     }
 
-    static boot () {
-        super.boot()
-        this.addHook('afterFind', 'ClientHook.attachRelatedModelsOnFind')
-        this.addHook('afterPaginate', 'ClientHook.attachCurrentClientSubscriptionOnClients')
+    getDateCreated ({ created_at }) {
+        return moment().format('MMM d, Y')
     }
 
     getName({ first_name, last_name }) {

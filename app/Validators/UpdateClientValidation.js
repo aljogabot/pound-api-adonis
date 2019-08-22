@@ -12,6 +12,7 @@ class UpdateClientValidation {
     get data() {
         const requestBody = this.ctx.request.all()
         delete requestBody.name
+        delete requestBody.has_valid_membership
         delete requestBody.has_valid_subscription
         delete requestBody.subscriptions
 

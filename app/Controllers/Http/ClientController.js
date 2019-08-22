@@ -38,13 +38,14 @@ class ClientController {
     }
 
     async view({ request, params }) {
-        return await Client.find(params.id)
+        return await Client.findOrFail(params.id)
     }
 
     async update({ request, params }) {
-        const client = await Client.find(params.id)
+        const client = await Client.findOrFail(params.id)
+        await client.reload()
+        client.merge(request.except(['id', 'created_at', 'updated_at']))
 
-        client.merge(request.all())
         await client.save()
 
         return { client }

@@ -1,6 +1,7 @@
 'use strict'
 
 const moment = require('moment')
+const Database = use('Database')
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
@@ -49,6 +50,10 @@ class ClientSubscription extends Model {
 
     client_membership () {
         return this.belongsTo('App/Models/ClientMembership')
+    }
+
+    static scopeGetByDate (query, date) {
+        return query.whereRaw(`DATE(created_at) = '${date}'`)
     }
 
 }

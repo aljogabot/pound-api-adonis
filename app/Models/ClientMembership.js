@@ -46,6 +46,10 @@ class ClientMembership extends Model {
     payment () {
         return this.belongsTo('App/Models/Payment')
     }
+
+    static scopeGetByDate(query, date) {
+        return query.whereRaw(`DATE(created_at) = '${date}'`)
+    }
 }
 
 module.exports = ClientMembership

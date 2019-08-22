@@ -44,7 +44,7 @@ class ClientController {
     async update({ request, params }) {
         const client = await Client.findOrFail(params.id)
         await client.reload()
-        client.merge(request.except(['id', 'created_at', 'updated_at']))
+        client.merge(request.except(['id', 'created_at', 'updated_at', 'date_created']))
 
         await client.save()
 
@@ -59,6 +59,7 @@ class ClientController {
         const client = await Client.create(clientData)
         const membershipAndSubscriptionData = request.only(membershipAndSubscriptionVars)
 
+        // ClientMembership Creation ...
         if (request.input('membership_id')) {
             let clientMembership
 
@@ -75,8 +76,7 @@ class ClientController {
                 return
             }
 
-            
-            // TODO: LATER ...
+            // ClientSubscription Creation
             if (request.input('subscription_id')) {
                 try {
                     await client.reload()

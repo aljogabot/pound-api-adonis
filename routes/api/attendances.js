@@ -4,5 +4,5 @@
 const Route = use('Route')
 
 Route.group(() => {
-    Route.post('create', 'AttendanceController.clientCreate')
+    Route.post('create', 'AttendanceController.clientCreate').validator('CreateClientAttendanceValidation')
 }).prefix('api/attendances/clients')

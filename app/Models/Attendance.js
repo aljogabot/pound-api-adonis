@@ -14,6 +14,16 @@ class Attendance extends Model {
             .where('is_session', true)
     }
 
+    static scopeExistsOnThisDate (query, clientId, dateIn) {
+        return query.where('client_id', clientId)
+            .where('date_in', dateIn)
+    }
+
+    purchases () {
+        return this.belongsToMany('App/Models/Product')
+            .pivotTable('attendance_product')
+            .withTimestamps()
+    }
 }
 
 module.exports = Attendance

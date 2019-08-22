@@ -2,7 +2,7 @@
 
 const ClientSubscription = use('App/Models/ClientSubscription')
 const ClientMembership = use('App/Models/ClientMembership')
-const Attendance = use('App/Models/Attendance')
+const ClientSession = use('App/Models/ClientSession')
 const Client = use('App/Models/Client')
 
 class EarningController {
@@ -33,13 +33,10 @@ class EarningController {
             sum += parseFloat(membership.amount)
         })
 
-        const clientSessions = await Attendance.query().with('client').getClientSessionsByDate(dateOnURL).fetch()
-        const client_sessions_count = clientSessions.rows.length
-
+        const clientSessions = await ClientSession.query().getByDate(dateOnURL).fetch()
         // Get Sum From Client Sessions on that DAY
         clientSessions.rows.forEach(clientSession => {
-            const client = Client.find(clientSession.getRelated('client').id)
-            sum += client.has_valid_membership ? 150 : 200
+            sum += clientSession.amount
         })
 
         const earnings = {
@@ -51,7 +48,7 @@ class EarningController {
             earnings,
             memberships_count: clientMemberships.rows.length,
             subscriptions_count: clientSubscriptions.rows.length,
-            client_sessions_count
+            client_sessions_count: clientSessions.rows.length
         }
     }
 

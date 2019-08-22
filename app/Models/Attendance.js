@@ -9,6 +9,10 @@ class Attendance extends Model {
         return this.belongsTo('App/Models/Client')
     }
 
+    static scopeGetByDate (query, date) {
+        return query.whereRaw(`DATE(date_in) = '${date}'`)
+    }
+
     static scopeGetClientSessionsByDate (query, date) {
         return query.whereRaw(`DATE(date_in) = '${date}'`)
             .where('is_session', true)

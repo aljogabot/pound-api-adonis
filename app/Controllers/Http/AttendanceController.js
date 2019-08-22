@@ -22,7 +22,7 @@ class AttendanceController {
         }
 
         const attendance = new Attendance()
-        attendance.fill(request.except(['is_session']))
+        attendance.fill(request.except(['is_session', 'client', 'refreshment_ids']))
         attendance.is_session = client.has_valid_subscription ? false : true
 
         if (! await client.attendances().save(attendance)) {
@@ -51,7 +51,30 @@ class AttendanceController {
         }
 
         return { attendance }
-    }   
+    }
+
+    async getByDate ({ request, params }) {
+        const dateInURL = params.date
+
+        const attendanceQuery = Attendance.query()
+            .getByDate(dateInURL)
+            .withCount('purchases')
+
+        const searchText = request.input('search', false)
+
+        if (searchText) {
+            attendanceQuery.whereHas('client', (query) => {
+                return query.where((query) => {
+                    query.where('first_name', 'like', `%${paginationParams.search}%`)
+                        .orWhere('last_name', 'like', `%${paginationParams.search}%`)
+                })
+            })
+        }
+
+        const attendances = await attendanceQuery.orderBy('created_at').fetch()
+        
+        return { attendances }
+    }
 
 }
 

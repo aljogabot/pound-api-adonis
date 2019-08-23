@@ -57,6 +57,7 @@ class AttendanceController {
         const dateInURL = params.date
 
         const attendanceQuery = Attendance.query()
+            .with('client')
             .getByDate(dateInURL)
             .withCount('purchases')
 

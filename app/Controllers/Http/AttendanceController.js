@@ -7,6 +7,8 @@ const ClientSession = use('App/Models/ClientSession')
 const ClientAlreadyHasAttendanceTodayException = use('App/Exceptions/ClientAlreadyHasAttendanceTodayException')
 const ClientHasNoSubscriptionOrExpiredException = use('App/Exceptions/ClientHasNoSubscriptionOrExpiredException')
 const CannotSaveClientAttendanceException = use('App/Exceptions/CannotSaveClientAttendanceException')
+const DeleteResourceNotAllowedException = use('App/Exceptions/DeleteResourceNotAllowedException')
+const DeleteResourceFailException = use('App/Exceptions/DeleteResourceFailException')
 
 class AttendanceController {
 
@@ -53,11 +55,37 @@ class AttendanceController {
         return { attendance }
     }
 
+    async clientUpdate ({ request, params }) {
+        const attendance = await Attendance.find(params.id)
+
+        attendance.merge(request.except(['date_in']))
+
+        await attendance.load('client')
+        const client = attendance.getRelated('client')
+
+        if (! client.has_valid_subscription && ! request.input('is_session', false)) {
+            throw new ClientHasNoSubscriptionOrExpiredException()
+        }
+
+        if (! await attendance.save()) {
+            throw new CannotSaveClientAttendanceException()
+        }
+
+        await attendance.purchases().detach(request.input('refreshment_ids', []))
+        await attendance.purchases().attach(request.input('refreshment_ids', []))
+
+        return {
+            message: 'Attendance updated successfully!!!',
+            attendance
+        }
+    }
+
     async getByDate ({ request, params }) {
         const dateInURL = params.date
 
         const attendanceQuery = Attendance.query()
             .with('client')
+            .with('purchases')
             .getByDate(dateInURL)
             .withCount('purchases')
 
@@ -75,6 +103,40 @@ class AttendanceController {
         const attendances = await attendanceQuery.orderBy('created_at').fetch()
         
         return { attendances }
+    }
+
+    async clientView ({ params }) {
+        return await Attendance.query()
+                        .with('client')
+                        .first(params.id)
+    }
+
+    async clientDestroy ({ request, params }) {
+        if (request.input('passcode') != 'b0gart') {
+            throw new DeleteResourceNotAllowedException()
+        }
+
+        const attendance = await Attendance.findOrFail(params.id)
+
+        if (! await attendance.delete()) {
+            throw new DeleteResourceFailException()
+        }
+
+        return { attendance }
+    }
+
+    async makeClientPaid ({ request, params }) {
+        const attendance = await Attendance.findOrFail(params.id)
+
+        attendance.paid = true
+        if (! await attendance.save()) {
+            throw new CannotSaveClientAttendanceException()
+        }
+
+        return {
+            success: true,
+            attendance
+        }
     }
 
 }

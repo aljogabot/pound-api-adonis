@@ -10,7 +10,6 @@ class Attendance extends Model {
     static boot() {
         super.boot()
         this.addHook('afterFetch', 'AttendanceHook.attachRelatedModelsOnFetch')
-        // this.addHook('afterFind', 'AttendanceHook.attachRelatedModelsOnFind')
     }
 
     static get dates() {
@@ -23,6 +22,14 @@ class Attendance extends Model {
         }
 
         return super.formatDates(field, value)
+    }
+
+    static get computed() {
+        return ['time_in_carbon']
+    }
+
+    getTimeInCarbon ({ created_at }) {
+        return moment(created_at).format('h:mm A')
     }
 
     client () {

@@ -10,6 +10,7 @@ class Attendance extends Model {
     static boot() {
         super.boot()
         this.addHook('afterFetch', 'AttendanceHook.attachRelatedModelsOnFetch')
+        // this.addHook('afterFind', 'AttendanceHook.attachRelatedModelsOnFind')
     }
 
     static get dates() {

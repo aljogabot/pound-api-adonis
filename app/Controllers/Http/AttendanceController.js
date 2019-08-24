@@ -56,9 +56,9 @@ class AttendanceController {
     }
 
     async clientUpdate ({ request, params }) {
-        const attendance = await Attendance.find(params.id)
+        const attendance = await Attendance.findOrFail(params.id)
 
-        attendance.merge(request.except(['date_in']))
+        const paid = request.input('paid', false)
 
         const client = await Client.find(attendance.client_id)
 
@@ -66,11 +66,14 @@ class AttendanceController {
             throw new ClientHasNoSubscriptionOrExpiredException()
         }
 
-        if (! await attendance.save()) {
-            throw new CannotSaveClientAttendanceException()
+        if (attendance.paid != paid) {
+            attendance.paid = paid
+            if (! await attendance.save()) {
+                throw new CannotSaveClientAttendanceException()
+            }
         }
 
-        await attendance.purchases().detach(request.input('refreshment_ids', []))
+        await attendance.purchases().detach()
         await attendance.purchases().attach(request.input('refreshment_ids', []))
 
         return {
@@ -106,10 +109,26 @@ class AttendanceController {
     }
 
     async clientView ({ params }) {
-        return await Attendance.query()
+        const attendance = await Attendance.query()
             .with('client')
+            .with('purchases')
+            .with('client_session')
             .where('id', params.id)
             .first()
+
+        const purchases = attendance.getRelated('purchases')
+        const clientSession = attendance.getRelated('client_session')
+
+        let totalAmount = 0
+        purchases.rows.forEach(product => totalAmount += parseFloat(product.amount))
+
+        if (attendance.is_session) {
+            totalAmount += parseFloat(clientSession.amount)
+        }
+
+        attendance.total_purchases = totalAmount.toFixed(2)
+
+        return attendance
     }
 
     async clientDestroy ({ request, params }) {

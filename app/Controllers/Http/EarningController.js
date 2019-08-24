@@ -41,7 +41,7 @@ class EarningController {
 
         const earnings = {
             date: dateOnURL,
-            earnings: sum
+            earnings: sum.toFixed(2)
         }
 
         return {

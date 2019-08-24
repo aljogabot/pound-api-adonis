@@ -60,8 +60,7 @@ class AttendanceController {
 
         attendance.merge(request.except(['date_in']))
 
-        await attendance.load('client')
-        const client = attendance.getRelated('client')
+        const client = await Client.find(attendance.client_id)
 
         if (! client.has_valid_subscription && ! request.input('is_session', false)) {
             throw new ClientHasNoSubscriptionOrExpiredException()
@@ -88,14 +87,15 @@ class AttendanceController {
             .with('purchases')
             .getByDate(dateInURL)
             .withCount('purchases')
+            .with('client_session')
 
         const searchText = request.input('search', false)
 
         if (searchText) {
             attendanceQuery.whereHas('client', (query) => {
                 return query.where((query) => {
-                    query.where('first_name', 'like', `%${paginationParams.search}%`)
-                        .orWhere('last_name', 'like', `%${paginationParams.search}%`)
+                    query.where('first_name', 'like', `%${searchText}%`)
+                        .orWhere('last_name', 'like', `%${searchText}%`)
                 })
             })
         }
@@ -107,8 +107,9 @@ class AttendanceController {
 
     async clientView ({ params }) {
         return await Attendance.query()
-                        .with('client')
-                        .first(params.id)
+            .with('client')
+            .where('id', params.id)
+            .first()
     }
 
     async clientDestroy ({ request, params }) {

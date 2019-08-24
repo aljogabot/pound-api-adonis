@@ -1,9 +1,28 @@
 'use strict'
 
+const moment = require('moment')
+
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
 
 class Attendance extends Model {
+
+    static boot() {
+        super.boot()
+        this.addHook('afterFetch', 'AttendanceHook.attachRelatedModelsOnFetch')
+    }
+
+    static get dates() {
+        return super.dates.concat(['date_in'])
+    }
+
+    static castDates(field, value) {
+        if (field == 'date_in') {
+            return value.format('YYYY-MM-DD')
+        }
+
+        return super.formatDates(field, value)
+    }
 
     client () {
         return this.belongsTo('App/Models/Client')
@@ -27,6 +46,10 @@ class Attendance extends Model {
         return this.belongsToMany('App/Models/Product')
             .pivotTable('attendance_product')
             .withTimestamps()
+    }
+
+    client_session () {
+        return this.hasOne('App/Models/ClientSession')
     }
 }
 

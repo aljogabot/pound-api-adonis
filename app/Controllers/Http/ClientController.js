@@ -5,6 +5,7 @@ const Client = use('App/Models/Client')
 const ClientMembershipYearly = use('App/Services/ClientMembership/Yearly')
 const ClientService = use('App/Services/ClientService')
 const ClientSubscriptionFactory = use('App/Services/ClientSubscription/ClientSubscriptionFactory')
+const LoggerService = use('App/Services/LoggerService')
 
 const MembershipNotFoundException = use('App/Exceptions/MembershipNotFoundException')
 const CannotAddClientMembershipException = use('App/Exceptions/CannotAddClientMembershipException')
@@ -46,7 +47,11 @@ class ClientController {
         await client.reload()
         client.merge(request.except(['id', 'created_at', 'updated_at', 'date_created']))
 
-        await client.save()
+        if (await client.save()) {
+            LoggerService.push({
+                
+            })
+        }
 
         return { client }
     }

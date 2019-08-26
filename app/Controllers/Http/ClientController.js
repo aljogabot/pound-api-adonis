@@ -48,9 +48,9 @@ class ClientController {
         client.merge(request.except(['id', 'created_at', 'updated_at', 'date_created']))
 
         if (await client.save()) {
-            LoggerService.push({
+            // LoggerService.push({
                 
-            })
+            // })
         }
 
         return { client }

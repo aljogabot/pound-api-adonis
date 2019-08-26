@@ -26,6 +26,15 @@ class DatabaseSeeder {
 
         await user.save()
 
+        const beth = new User()
+        beth.merge({
+            name: 'Maribeth Gabot',
+            email: 'beth.gabot@gmail.com',
+            password: '0n3m0r3ch@nc3'
+        })
+
+        await beth.save()
+
         const ephraim = new User()
         ephraim.merge({
             name: 'Ephraim Latagan',

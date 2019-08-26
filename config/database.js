@@ -3,6 +3,12 @@
 /** @type {import('@adonisjs/framework/src/Env')} */
 const Env = use('Env')
 
+// Set Up Database ...
+const Url = require('url-parse')
+const DATABASE_URL = new Url(Env.get('CLEARDB_DATABASE_URL'))
+
+const appEnv = Env.get('NODE_ENV')
+
 /** @type {import('@adonisjs/ignitor/src/Helpers')} */
 const Helpers = use('Helpers')
 
@@ -73,11 +79,11 @@ module.exports = {
   pg: {
     client: 'pg',
     connection: {
-      host: Env.get('DB_HOST', 'localhost'),
+      host: appEnv == 'production' ? DATABASE_URL.host : Env.get('DB_HOST', 'localhost'),
       port: Env.get('DB_PORT', ''),
-      user: Env.get('DB_USER', 'root'),
-      password: Env.get('DB_PASSWORD', ''),
-      database: Env.get('DB_DATABASE', 'adonis')
+      user: appEnv == 'production' ? DATABASE_URL.username : Env.get('DB_USER', 'root'),
+      password: appEnv == 'production' ? DATABASE_URL.password : Env.get('DB_PASSWORD', ''),
+      database: appEnv == 'production' ? DATABASE_URL.pathname.substr(1) : Env.get('DB_DATABASE', 'adonis')
     },
     debug: Env.get('DB_DEBUG', false)
   }

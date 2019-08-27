@@ -54,11 +54,11 @@ class Client extends Model {
     }
 
     currentClientSubscription() {
-        return this.hasOne('App/Models/ClientSubscription').orderBy('created_at')
+        return this.hasOne('App/Models/ClientSubscription').orderBy('created_at', 'desc')
     }
 
     currentClientMembership() {
-        return this.hasOne('App/Models/ClientMembership').orderBy('created_at')
+        return this.hasOne('App/Models/ClientMembership').orderBy('created_at', 'desc')
     }
 
     static scopeCheckIfExists (query, data) {

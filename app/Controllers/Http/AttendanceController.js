@@ -20,8 +20,7 @@ class AttendanceController {
         }
 
         if (! client.has_valid_subscription && ! request.input('is_session', false)) {
-            return await client.currentClientSubscription().fetch()
-            // throw new ClientHasNoSubscriptionOrExpiredException()
+            throw new ClientHasNoSubscriptionOrExpiredException()
         }
 
         const attendance = new Attendance()

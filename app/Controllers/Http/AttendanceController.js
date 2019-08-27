@@ -20,7 +20,8 @@ class AttendanceController {
         }
 
         if (! client.has_valid_subscription && ! request.input('is_session', false)) {
-            throw new ClientHasNoSubscriptionOrExpiredException()
+            return client
+            // throw new ClientHasNoSubscriptionOrExpiredException()
         }
 
         const attendance = new Attendance()

@@ -6,7 +6,7 @@ const Model = use('Model')
 class Subscription extends Model {
     static castDates(field, value) {
         if (field == 'created_at') {
-            return value.format('MMM d, Y')
+            return value.format('MMM DD, Y')
         }
         
         return super.formatDates(field, value)

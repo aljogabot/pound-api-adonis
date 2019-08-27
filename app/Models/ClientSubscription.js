@@ -29,7 +29,7 @@ class ClientSubscription extends Model {
     }
 
     getActiveUntil({ valid_until }) {
-        return moment(valid_until).format('MMM d, Y')
+        return moment(valid_until).format('MMM DD, Y')
     }
 
     getActive({ valid_until }) {

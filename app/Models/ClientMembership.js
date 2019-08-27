@@ -24,7 +24,7 @@ class ClientMembership extends Model {
     }
 
     getActiveUntil ({ valid_until }) {
-        return moment(valid_until).format('MMM d, Y')
+        return moment(valid_until).format('MMM DD, Y')
     }
 
     getIsValid ({ valid_until }) {

@@ -26,7 +26,7 @@ class Client extends Model {
     }
 
     getDateCreated ({ created_at }) {
-        return moment().format('MMM d, Y')
+        return moment().format('MMM DD, Y')
     }
 
     getName({ first_name, last_name }) {

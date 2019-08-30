@@ -18,8 +18,8 @@ const User = use('App/Models/User')
 class DatabaseSeeder {
     async run () {
         const user = await User.query().where('email', 'bogart@bogart.com').first()
-        console.log(user.id)
-        user.password = 'password'
+
+        user.merge({password: 'password'})
         await user.save()
 
         // const user = new User()

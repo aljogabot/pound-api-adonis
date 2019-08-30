@@ -39,9 +39,10 @@ class Monthly {
             throw new ClientMustHaveAValidMembershipFirstException()
         }
 
-        if (this.client.has_valid_subscription) {
-            throw new ClientAlreadyHasValidSubscriptionException()
-        }
+        // Disable this ... Clients can make top up ...
+        // if (this.client.has_valid_subscription) {
+        //     throw new ClientAlreadyHasValidSubscriptionException()
+        // }
 
         this.payment.amount = this.subscription.amount
         this.payment.remarks = `${this.subscription.description} for client: ${this.client.fullName()}`

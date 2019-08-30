@@ -17,41 +17,45 @@ const User = use('App/Models/User')
 
 class DatabaseSeeder {
     async run () {
-        const user = new User()
-        user.merge({
-            name: 'Aljo Victor Gabot',
-            email: 'aljo.gabot@gmail.com',
-            password: '0n3m0r3ch@nc3'
-        })
-
+        const user = await User.query().where('email', 'bogart@bogart.com').first()
+        user.password = 'password'
         await user.save()
 
-        const beth = new User()
-        beth.merge({
-            name: 'Maribeth Gabot',
-            email: 'beth.gabot@gmail.com',
-            password: '0n3m0r3ch@nc3'
-        })
+        // const user = new User()
+        // user.merge({
+        //     name: 'Aljo Victor Gabot',
+        //     email: 'aljo.gabot@gmail.com',
+        //     password: '0n3m0r3ch@nc3'
+        // })
 
-        await beth.save()
+        // await user.save()
 
-        const ephraim = new User()
-        ephraim.merge({
-            name: 'Ephraim Latagan',
-            email: 'ephraim.latagan@pound-southwoods.com',
-            password: 'password'
-        })
+        // const beth = new User()
+        // beth.merge({
+        //     name: 'Maribeth Gabot',
+        //     email: 'beth.gabot@gmail.com',
+        //     password: '0n3m0r3ch@nc3'
+        // })
 
-        await ephraim.save()
+        // await beth.save()
 
-        const jeff = new User()
-        jeff.merge({
-            name: 'Jeff Verceles',
-            email: 'jeff.verceles@pound-southwoods.com',
-            password: 'password'
-        })
+        // const ephraim = new User()
+        // ephraim.merge({
+        //     name: 'Ephraim Latagan',
+        //     email: 'ephraim.latagan@pound-southwoods.com',
+        //     password: 'password'
+        // })
 
-        await jeff.save()
+        // await ephraim.save()
+
+        // const jeff = new User()
+        // jeff.merge({
+        //     name: 'Jeff Verceles',
+        //     email: 'jeff.verceles@pound-southwoods.com',
+        //     password: 'password'
+        // })
+
+        // await jeff.save()
     }
 }
 

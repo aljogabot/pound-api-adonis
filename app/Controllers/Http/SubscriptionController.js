@@ -33,6 +33,8 @@ class SubscriptionController {
             throw new SubscriptionAlreadyCreatedException()
         }
 
+        console.log(subscriptionData)
+
         const subscription = await Subscription.create(subscriptionData)
         
         return {message: 'Yeah', subscription}

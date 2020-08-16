@@ -65,45 +65,45 @@ class ClientController {
         const membershipAndSubscriptionData = request.only(membershipAndSubscriptionVars)
 
         // ClientMembership Creation ...
-        if (request.input('membership_id')) {
-            let clientMembership
+        // if (request.input('membership_id')) {
+        let clientMembership
 
+        try {
+
+            clientMembership = await ClientMembershipYearly.setData(membershipAndSubscriptionData)
+                .create(client)
+
+        } catch (error) {
+            client.delete()
+
+            const classExceptionName = error.name ? error.name : 'CannotAddClientMembershipException'
+            eval(`throw new ${classExceptionName}()`)
+            return
+        }
+
+        // ClientSubscription Creation
+        if (request.input('subscription_id')) {
             try {
+                await client.reload()
+                const ClientSubscriptionService = await ClientSubscriptionFactory.initialize(client, request.input('subscription_id'))
 
-                clientMembership = await ClientMembershipYearly.setData(membershipAndSubscriptionData)
-                    .create(client)
-
+                ClientSubscriptionService.setData(membershipAndSubscriptionData)
+                    .setClientMembership(clientMembership)
+                await ClientSubscriptionService.create()
             } catch (error) {
                 client.delete()
+                await clientMembership.load('payment')
+                const payment = clientMembership.getRelated('payment')
+                payment.delete()
+                clientMembership.delete()
 
-                const classExceptionName = error.name ? error.name : 'CannotAddClientMembershipException'
+                const classExceptionName = error.name ? error.name : 'CannotAddClientSubscriptionException'
                 eval(`throw new ${classExceptionName}()`)
                 return
             }
-
-            // ClientSubscription Creation
-            if (request.input('subscription_id')) {
-                try {
-                    await client.reload()
-                    const ClientSubscriptionService = await ClientSubscriptionFactory.initialize(client, request.input('subscription_id'))
-
-                    ClientSubscriptionService.setData(membershipAndSubscriptionData)
-                        .setClientMembership(clientMembership)
-                    await ClientSubscriptionService.create()
-                } catch (error) {
-                    client.delete()
-                    await clientMembership.load('payment')
-                    const payment = clientMembership.getRelated('payment')
-                    payment.delete()
-                    clientMembership.delete()
-
-                    const classExceptionName = error.name ? error.name : 'CannotAddClientSubscriptionException'
-                    eval(`throw new ${classExceptionName}()`)
-                    return
-                }
-            }
-
         }
+
+        // }
 
         return {message: 'Yeah', client}
     }

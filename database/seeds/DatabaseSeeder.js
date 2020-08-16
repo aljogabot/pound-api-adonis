@@ -11,9 +11,9 @@
 */
 
 /** @type {import('@adonisjs/lucid/src/Factory')} */
-const Factory = use('Factory')
-
-const User = use('App/Models/User')
+const Factory       = use('Factory')
+const User          = use('App/Models/User')
+const Membership    = use('App/Models/Membership')
 
 class DatabaseSeeder {
     async run () {
@@ -24,6 +24,18 @@ class DatabaseSeeder {
             password: 'password'
         })
         await user.save()
+
+
+        const fiveYearMembership = new Membership()
+        fiveYearMembership.merge({
+            duration: 5,
+            type: 'years',
+            description: '5 Year Free Membership',
+            is_promo: true,
+            amount: 0.00
+        })
+
+        await fiveYearMembership.save()
 
         // const user = new User()
         // user.merge({

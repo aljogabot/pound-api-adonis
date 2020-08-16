@@ -20,10 +20,13 @@ class ClientMembershipYearly {
             throw new ClientAlreadyHasValidMembershipException()
         }
         
-        const membership = await Membership.find(this.clientMembershipData.membership_id)
-        if (! membership) {
-            throw new MembershipNotFoundException()
-        }
+        // const membership = await Membership.find(this.clientMembershipData.membership_id)
+        // if (! membership) {
+        //     // throw new MembershipNotFoundException()
+        //     membership = await Membership.first()
+        // }
+
+        const membership = await Membership.first()
 
         this.payment.amount = membership.amount
         this.payment.remarks = `${membership.description} for client: ${client.fullName()}`
@@ -31,13 +34,13 @@ class ClientMembershipYearly {
         await client.payments().save(this.payment)
 
         const startDate = this.clientMembershipData.membership_start_date
-        const plusOneYear = moment(startDate).add(1, 'year')
+        const plusOneYear = moment(startDate).add(membership.duration, 'year')
         
         const clientMembership = new ClientMembership()
         clientMembership.fill({
             valid_from: startDate,
             valid_until: plusOneYear,
-            description: this.clientMembershipData.description ? this.clientMembershipData.description : 'One Year Membership',
+            description: `${membership.description} for client: ${client.fullName()}`,
             remarks: this.clientMembershipData.remarks ? this.clientMembershipData.remarks : `${membership.description} for client: ${client.fullName()}`,
             payment_id: this.payment.id,
             membership_id: membership.id

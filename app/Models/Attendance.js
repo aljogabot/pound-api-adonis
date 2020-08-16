@@ -52,7 +52,7 @@ class Attendance extends Model {
 
     purchases () {
         return this.belongsToMany('App/Models/Product')
-            .pivotTable('attendance_product')
+            .pivotTable('attendance_products')
             .withTimestamps()
     }
 

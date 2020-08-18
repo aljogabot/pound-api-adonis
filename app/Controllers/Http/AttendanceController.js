@@ -38,7 +38,7 @@ class AttendanceController {
             const clientSession = new ClientSession()
             clientSession.fill({
                 date_in: request.input('date_in'),
-                amount: client.has_valid_membership ? 150 : 200,
+                amount: 50,
                 attendance_id: attendance.id,
                 client_id: client.id
             })
